@@ -8,6 +8,7 @@ import { TextInputSuggester } from './suggester'
 import { generateHotkeySuggestion } from 'src/utils/htmlUtils'
 import { isValidExtension, type FileExtension, type FileType } from 'src/utils/getFileTypeUtils'
 import { get } from 'svelte/store'
+import { t } from 'src/i18n'
 import HomeTabFileSuggestion from 'src/ui/svelteComponents/homeTabFileSuggestion.svelte'
 
 declare module 'obsidian'{
@@ -32,11 +33,11 @@ export default class HomeTabFileSuggester extends TextInputSuggester<Fuse.FuseRe
                 containerClass: `home-tab-suggestion-container ${Platform.isPhone ? 'is-phone' : ''}`,
                 additionalClasses: `${plugin.settings.selectionHighlight === 'accentColor' ? 'use-accent-color' : ''}`,
                 additionalModalInfo: plugin.settings.showShortcuts ? generateHotkeySuggestion([
-                    {hotkey: '↑↓', action: 'to navigate'},
-                    {hotkey: '↵', action: 'to open'},
-                    {hotkey: 'shift ↵', action: 'to create'},
-                    {hotkey: 'ctrl ↵', action: 'to open in new tab'},
-                    {hotkey: 'esc', action: 'to dismiss'},], 
+                    {hotkey: '↑↓', action: t('hotkey_navigate')},
+                    {hotkey: '↵', action: t('hotkey_open')},
+                    {hotkey: 'shift ↵', action: t('hotkey_create')},
+                    {hotkey: 'ctrl ↵', action: t('hotkey_openNewTab')},
+                    {hotkey: 'esc', action: t('hotkey_dismiss')},], 
                     'home-tab-hotkey-suggestions') : undefined
                 }, plugin.settings.searchDelay)
         this.plugin = plugin

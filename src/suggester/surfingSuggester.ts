@@ -5,6 +5,7 @@ import type HomeTabSearchBar from "src/homeTabSearchbar"
 import { TextInputSuggester } from './suggester'
 import { generateHotkeySuggestion } from 'src/utils/htmlUtils'
 import { get } from 'svelte/store'
+import { t } from 'src/i18n'
 import SurfingSuggestion from 'src/ui/svelteComponents/surfingSuggestion.svelte'
 import { SurfingItemFuzzySearch } from './fuzzySearch'
 
@@ -68,10 +69,10 @@ export default class SurfingSuggester extends TextInputSuggester<Fuse.FuseResult
                 containerClass: `home-tab-suggestion-container ${Platform.isPhone ? 'is-phone' : ''}`,
                 additionalClasses: `${plugin.settings.selectionHighlight === 'accentColor' ? 'use-accent-color' : ''}`,
                 additionalModalInfo: plugin.settings.showShortcuts ? generateHotkeySuggestion([
-                    {hotkey: '↑↓', action: 'to navigate'},
-                    {hotkey: '↵', action: 'to open'},
-                    {hotkey: 'ctrl ↵', action: 'to open in new tab'},
-                    {hotkey: 'esc', action: 'to dismiss'},], 
+                    {hotkey: '↑↓', action: t('hotkey_navigate')},
+                    {hotkey: '↵', action: t('hotkey_open')},
+                    {hotkey: 'ctrl ↵', action: t('hotkey_openNewTab')},
+                    {hotkey: 'esc', action: t('hotkey_dismiss')},], 
                     'home-tab-hotkey-suggestions') : undefined
                 }, plugin.settings.searchDelay)
 
@@ -151,7 +152,7 @@ export default class SurfingSuggester extends TextInputSuggester<Fuse.FuseResult
         let info: string = ''
 
         if(suggestion.item.type === 'newUrl'){
-            info = `Search with ${this.surfingPlugin.settings.defaultSearchEngine}`
+            info = t('surfing_searchWith', {engine: this.surfingPlugin.settings.defaultSearchEngine})
         }
 
         return {info: info}

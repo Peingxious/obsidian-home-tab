@@ -12,6 +12,9 @@ You can search any local file in your vault, both markdown notes and attachments
 This plugin is not meant to be a replacement for the default Quick switcher or any alternative one like [Another quick switcher](https://github.com/tadashi-aikawa/obsidian-another-quick-switcher) (from which I took inspiration), but rather a faster way to open a note or a file after opening a new tab.
 
 ## Changelog
+### 1.3.0
+- **Internationalization (i18n)**: added a translation system. The active language is detected automatically from the Obsidian UI language (the Chinese `zh` locale is now bundled); all settings, commands, notices, and in-UI labels are localized.
+
 ### 1.2.3
 Performance and stability improvements (no behavior changes for end users):
 - **Faster startup**: the Home view and its search subsystem (homepage, search bar, suggesters, `fuse.js`) are now lazy-loaded, so the plugin no longer eagerly parses the heavy module graph on load.

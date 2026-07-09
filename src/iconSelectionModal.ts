@@ -1,6 +1,7 @@
 import { App, Modal, Setting } from 'obsidian'
 import iconSuggester from './suggester/iconSuggester'
 import { lucideIcons, type LucideIcon } from './utils/lucideIcons'
+import { t } from './i18n'
 
 export class IconSelectionModal extends Modal{
     icon: string | undefined
@@ -16,17 +17,17 @@ export class IconSelectionModal extends Modal{
     onOpen(): void{
         const { contentEl } = this
 
-        contentEl.createEl('h1', {text: 'Set a custom icon'})
+        contentEl.createEl('h1', {text: t('modal_setCustomIcon')})
 
         const iconSetting = new Setting(contentEl)
-            .setName('Choose an icon')
-            .setDesc('Accepts any lucide icon id.')
+            .setName(t('modal_chooseIcon'))
+            .setDesc(t('modal_chooseIcon_desc'))
 
         let invalidInputIcon: HTMLElement
         iconSetting
             .addExtraButton((button) => {button
                 .setIcon('alert-circle')
-                .setTooltip('The icon id is not valid.')
+                .setTooltip(t('modal_invalidIcon'))
                 invalidInputIcon = button.extraSettingsEl
                 invalidInputIcon.toggleVisibility(false)
                 invalidInputIcon.addClass('mod-warning')})
@@ -39,7 +40,7 @@ export class IconSelectionModal extends Modal{
                     true)
 
                 text
-                .setPlaceholder('Type to start search...')
+                .setPlaceholder(t('modal_typeToSearch'))
                 .setValue(this.icon ?? '')
                 .onChange(value => {
                     // if(value === '' || value == '/'){
@@ -61,14 +62,14 @@ export class IconSelectionModal extends Modal{
         new Setting(contentEl)
             .addButton((btn) =>
                 btn
-                .setButtonText("Close modal")
+                .setButtonText(t('modal_close'))
                 // .setCta()
                 .onClick(() => {
                     this.close();
                 }))
             .addButton((btn) =>
                 btn
-                .setButtonText("Set icon")
+                .setButtonText(t('modal_setIcon'))
                 .setCta()
                 .onClick(() => {
                     this.icon ? this.onSubmit(this.icon as LucideIcon) : null

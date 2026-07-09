@@ -5,6 +5,7 @@ import HomeTabFileSuggester from "src/suggester/homeTabSuggester";
 import OmnisearchSuggester from "./suggester/omnisearchSuggester";
 import SurfingSuggester from "./suggester/surfingSuggester";
 import { fileTypes, type FileExtension, type FileType, fileExtensions } from "./utils/getFileTypeUtils";
+import { t } from './i18n';
 
 export type SearchBarFilterType = 'fileExtension' | 'fileType' | 'webSearch' | 'omnisearch' | 'default'
 
@@ -105,7 +106,7 @@ export default class HomeTabSearchBar{
                     this.fileSuggester.setInput('')
                 }
                 else{
-                    new Notice('Omnisearch plugins is not enabled.')
+                    new Notice(t('notice_omnisearchNotEnabled'))
                     this.updateActiveSuggester('default')
                 }
                 break;
@@ -116,7 +117,7 @@ export default class HomeTabSearchBar{
                     this.fileSuggester.setInput('')
                 }
                 else{
-                    new Notice('Surfing plugin is not enabled.')
+                    new Notice(t('notice_surfingNotEnabled'))
                     this.updateActiveSuggester('default')
                 }
                 break;

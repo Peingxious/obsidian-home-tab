@@ -2,6 +2,7 @@ import { Component, Notice, TAbstractFile, TFile, type App, type BookmarkItem, t
 import { get, type Writable } from "svelte/store";
 import type HomeTab from "./main";
 import type { LucideIcon } from "./utils/lucideIcons";
+import { t } from './i18n';
 
 export interface bookmarkedFileStore{
     filepath: string
@@ -118,7 +119,7 @@ export class bookmarkedFilesManager extends Component{
             if(item) this.app.internalPlugins.plugins.bookmarks.instance.removeItem(item)
         }
         else{
-            new Notice("Bookmarks plugin is not enabled")
+            new Notice(t('notice_bookmarksNotEnabled'))
         }
     }
 }

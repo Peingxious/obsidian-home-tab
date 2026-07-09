@@ -9,6 +9,7 @@ import type fontSuggesterType from './suggester/fontSuggester'
 import type { recentFileStore } from './recentFiles'
 import type { bookmarkedFileStore } from './bookmarkedFiles'
 import { checkFont } from './utils/fontValidator'
+import { t } from './i18n'
 
 type ColorChoices = 'default' | 'accentColor' | 'custom'
 type LogoChoiches = 'default' | 'imagePath' | 'imageLink' | 'lucideIcon' | 'oldLogo' | 'none'
@@ -103,64 +104,64 @@ export class HomeTabSettingTab extends PluginSettingTab{
         const {containerEl} = this
         containerEl.empty()
 
-		containerEl.createEl('h3', {text: 'Home tab settings'});
+		containerEl.createEl('h3', {text: t('settings_title')});
 
-        containerEl.createEl('h2', {text: 'General settings'});
+        containerEl.createEl('h2', {text: t('settings_general')});
         new Setting(containerEl)
-        .setName('Replace new tabs with Home tab')
+        .setName(t('settings_replaceNewTabs'))
         .addToggle(toggle => toggle
             .setValue(this.plugin.settings.replaceNewTabs)
             .onChange(value => {this.plugin.settings.replaceNewTabs = value; this.plugin.saveSettings()}))
 
         new Setting(containerEl)
-        .setName('Open new Home tab on Obsidian start')
-        .setDesc('If a Home tab is already open it\'ll focus it instead of opening a new one.')
+        .setName(t('settings_openOnStart'))
+        .setDesc(t('settings_openOnStart_desc'))
         .addToggle(toggle => toggle
             .setValue(this.plugin.settings.newTabOnStart)
             .onChange(value => {this.plugin.settings.newTabOnStart = value; this.plugin.saveSettings(); this.display()}))
 
         if(this.plugin.settings.newTabOnStart){
             new Setting(containerEl)
-                .setName('Close previous session tabs on start')
-                .setDesc('Enable this to close all the tabs and leave only one Home tab on Obsidian opening.')
+                .setName(t('settings_closePreviousOnStart'))
+                .setDesc(t('settings_closePreviousOnStart_desc'))
                 .addToggle(toggle => toggle
                     .setValue(this.plugin.settings.closePreviousSessionTabs)
                     .onChange(value => {this.plugin.settings.closePreviousSessionTabs = value; this.plugin.saveSettings()}))
         }
 
-		containerEl.createEl('h2', {text: 'Search settings'});
+		containerEl.createEl('h2', {text: t('settings_search')});
         if(this.plugin.app.plugins.getPlugin('omnisearch')){
             new Setting(containerEl)
-                .setName('Use Omnisearch')
-                .setDesc('Set Omnisearch as the default search engine.')
+                .setName(t('settings_useOmnisearch'))
+                .setDesc(t('settings_useOmnisearch_desc'))
                 .addToggle(toggle => toggle
                     .setValue(this.plugin.settings.omnisearch)
                     .onChange(value => {this.plugin.settings.omnisearch = value; this.plugin.saveSettings(); this.display(); this.plugin.refreshOpenViews()}))
         }
         if(!this.plugin.settings.omnisearch){
             new Setting(containerEl)
-                .setName('Search only markdown files')
+                .setName(t('settings_markdownOnly'))
                 .addToggle(toggle => toggle
                     .setValue(this.plugin.settings.markdownOnly)
                     .onChange(value => {this.plugin.settings.markdownOnly = value; this.plugin.saveSettings(); this.plugin.refreshOpenViews()}))
     
             new Setting(containerEl)
-                .setName('Show uncreated files')
+                .setName(t('settings_showUncreated'))
                 .addToggle(toggle => toggle
                     .setValue(this.plugin.settings.unresolvedLinks)
                     .onChange(value => {this.plugin.settings.unresolvedLinks = value; this.plugin.saveSettings(); this.plugin.refreshOpenViews()}))
             
             new Setting(containerEl)
-                .setName('Show file path')
-                .setDesc('Displays file path at the right of the filename.')
+                .setName(t('settings_showPath'))
+                .setDesc(t('settings_showPath_desc'))
                 .addToggle((toggle) => toggle
                     .setValue(this.plugin.settings.showPath)
                     .onChange((value) => {this.plugin.settings.showPath = value; this.plugin.saveSettings()}))
         }
 
         new Setting(containerEl)
-            .setName('Show shorcuts')
-            .setDesc('Displays shortcuts under the search results.')
+            .setName(t('settings_showShortcuts'))
+            .setDesc(t('settings_showShortcuts_desc'))
             .addToggle((toggle) => toggle
                 .setValue(this.plugin.settings.showShortcuts)
                 .onChange((value) => {
@@ -171,8 +172,8 @@ export class HomeTabSettingTab extends PluginSettingTab{
             ))
 
         new Setting(containerEl)
-            .setName('Search results')
-            .setDesc('Set how many results display.')
+            .setName(t('settings_searchResults'))
+            .setDesc(t('settings_searchResults_desc'))
             .addSlider((slider) => slider
                 .setLimits(1, 25, 1)
                 .setValue(this.plugin.settings.maxResults)
@@ -181,8 +182,8 @@ export class HomeTabSettingTab extends PluginSettingTab{
             .then((settingEl) => this.addResetButton(settingEl, 'maxResults'))
 
         new Setting(containerEl)
-            .setName('Search delay')
-            .setDesc('The value is in milliseconds.')
+            .setName(t('settings_searchDelay'))
+            .setDesc(t('settings_searchDelay_desc'))
             .addSlider((slider) => slider
                 .setLimits(0, 500, 10)
                 .setValue(this.plugin.settings.searchDelay)
@@ -192,8 +193,8 @@ export class HomeTabSettingTab extends PluginSettingTab{
 
         if(this.plugin.app.plugins.getPlugin('omnisearch')){
             new Setting(containerEl)
-                .setName('Show excerpt (Omnisearch)')
-                .setDesc('Shows the contextual part of the note that matches the search.')
+                .setName(t('settings_showExcerpt'))
+                .setDesc(t('settings_showExcerpt_desc'))
                 .addToggle((toggle) => toggle
                     .setValue(this.plugin.settings.showOmnisearchExcerpt)
                     .onChange((value) => {
@@ -203,12 +204,12 @@ export class HomeTabSettingTab extends PluginSettingTab{
                 ))
         }
 
-        containerEl.createEl('h2', {text: 'Files display'});
+        containerEl.createEl('h2', {text: t('settings_filesDisplay')});
         
         if(app.internalPlugins.getPluginById('bookmarks')){
             new Setting(containerEl)
-            .setName('Show bookmarked files')
-            .setDesc('Shows bookmarked files under the search bar.')
+            .setName(t('settings_showBookmarks'))
+            .setDesc(t('settings_showBookmarks_desc'))
             .addToggle((toggle) => toggle
                 .setValue(this.plugin.settings.showbookmarkedFiles)
                 .onChange((value) => {this.plugin.settings.showbookmarkedFiles = value; this.plugin.saveSettings(); this.plugin.refreshOpenViews()
@@ -220,8 +221,8 @@ export class HomeTabSettingTab extends PluginSettingTab{
         }
 
         new Setting(containerEl)
-            .setName('Show recent files')
-            .setDesc('Displays recent files under the search bar.')
+            .setName(t('settings_showRecent'))
+            .setDesc(t('settings_showRecent_desc'))
             .addToggle((toggle) => toggle
                 .setValue(this.plugin.settings.showRecentFiles)
                 .onChange((value) => {this.plugin.settings.showRecentFiles = value; this.plugin.saveSettings(); this.display(); this.plugin.refreshOpenViews()
@@ -233,15 +234,15 @@ export class HomeTabSettingTab extends PluginSettingTab{
 
         if(this.plugin.settings.showRecentFiles){
             new Setting(containerEl)
-            .setName('Store last recent files')
-            .setDesc('Remembers the recent files of the previous session.')
+            .setName(t('settings_storeRecent'))
+            .setDesc(t('settings_storeRecent_desc'))
             .addToggle((toggle) => toggle
                 .setValue(this.plugin.settings.storeRecentFile)
                 .onChange((value) => {this.plugin.settings.storeRecentFile = value; this.plugin.saveSettings()}))
 
             new Setting(containerEl)
-                .setName('Recent files')
-                .setDesc('Set how many recent files display.')
+                .setName(t('settings_recentFiles'))
+                .setDesc(t('settings_recentFiles_desc'))
                 .addSlider((slider) => slider
                     .setValue(this.plugin.settings.maxRecentFiles)
                     .setLimits(1, 25, 1)
@@ -250,11 +251,11 @@ export class HomeTabSettingTab extends PluginSettingTab{
                 .then((settingEl) => this.addResetButton(settingEl, 'maxRecentFiles'))
         }
 
-        containerEl.createEl('h2', {text: 'Appearance'});
+        containerEl.createEl('h2', {text: t('settings_appearance')});
 
         const logoTypeSetting = new Setting(containerEl)
-            .setName('Logo')
-            .setDesc('Remove or set a custom logo. Accepts local files, links to images or lucide icon ids.')
+            .setName(t('settings_logo'))
+            .setDesc(t('settings_logo_desc'))
 
         logoTypeSetting.descEl.parentElement?.addClass('ultra-compressed')
 
@@ -262,7 +263,7 @@ export class HomeTabSettingTab extends PluginSettingTab{
         logoTypeSetting
             .addExtraButton((button) => {button
                 .setIcon('alert-circle')
-                .setTooltip('The path/link/icon is not valid.')
+                .setTooltip(t('settings_invalidPath'))
                 invalidInputIcon = button.extraSettingsEl
                 invalidInputIcon.toggleVisibility(false)
                 invalidInputIcon.addClass('mod-warning')})
@@ -284,7 +285,7 @@ export class HomeTabSettingTab extends PluginSettingTab{
                     }
                     text
                         // .setPlaceholder(this.plugin.settings.logo[this.plugin.settings.logoType] != '' ? this.plugin.settings.logo[this.plugin.settings.logoType] : 'Type anything ... ')
-                        .setPlaceholder('Type anything ... ')
+                        .setPlaceholder(t('settings_typeAnything'))
                         .setValue(this.plugin.settings.logo[this.plugin.settings.logoType] != '' ? this.plugin.settings.logo[this.plugin.settings.logoType] : '')
                         .onChange(async (value) => {
                             if(value === '' || value == '/'){
@@ -329,20 +330,20 @@ export class HomeTabSettingTab extends PluginSettingTab{
 
         logoTypeSetting
             .addDropdown((dropdown) => dropdown
-                .addOption('default', 'Obsidian logo')
-                .addOption('oldLogo', 'Obsidian old logo')
-                .addOption('imagePath', 'Local image')
-                .addOption('imageLink', 'Link')
-                .addOption('lucideIcon', 'Lucide icon')
-                .addOption('none', 'Empty')
+                .addOption('default', t('opt_obsidianLogo'))
+                .addOption('oldLogo', t('opt_oldLogo'))
+                .addOption('imagePath', t('opt_localImage'))
+                .addOption('imageLink', t('opt_link'))
+                .addOption('lucideIcon', t('opt_lucideIcon'))
+                .addOption('none', t('opt_empty'))
                 .setValue(this.plugin.settings.logoType)
                 .onChange((value: LogoChoiches) => {this.plugin.settings.logoType = value; this.plugin.saveSettings(); this.display()}))
             .then((settingEl) => this.addResetButton(settingEl, 'logoType'))
         
         if(this.plugin.settings.logoType === 'lucideIcon'){
             const iconColorSetting = new Setting(containerEl)
-                .setName('Logo icon color')
-                .setDesc('Set the icon color')
+                .setName(t('settings_logoIconColor'))
+                .setDesc(t('settings_logoIconColor_desc'))
                 
             if (this.plugin.settings.iconColorType === 'custom'){
                 iconColorSetting.addColorPicker((colorPicker) => colorPicker
@@ -352,17 +353,17 @@ export class HomeTabSettingTab extends PluginSettingTab{
                 
             iconColorSetting
                 .addDropdown((dropdown) => dropdown
-                    .addOption('default', 'Theme default')
-                    .addOption('accentColor', 'Accent color')
-                    .addOption('custom', 'Custom')
+                    .addOption('default', t('opt_themeDefault'))
+                    .addOption('accentColor', t('opt_accentColor'))
+                    .addOption('custom', t('opt_custom'))
                     .setValue(this.plugin.settings.iconColorType)
                     .onChange((value: ColorChoices) => {this.plugin.settings.iconColorType = value; this.plugin.saveSettings(); this.display()}))
             .then((settingEl) => this.addResetButton(settingEl, 'iconColorType'))
         }
         
         new Setting(containerEl)
-            .setName('Logo scale')
-            .setDesc('Set the logo dimensions relative to the title font size.')
+            .setName(t('settings_logoScale'))
+            .setDesc(t('settings_logoScale_desc'))
             .addSlider((slider) => slider
                 .setDynamicTooltip()
                 .setLimits(0.3,3, 0.1)
@@ -374,7 +375,7 @@ export class HomeTabSettingTab extends PluginSettingTab{
             .then((settingEl) => this.addResetButton(settingEl, 'logoScale'))
         
         new Setting(containerEl)
-            .setName('Title')
+            .setName(t('settings_titleSetting'))
             // .setDesc('Set a custom title')
             .addText((text) => text
                 .setValue(this.plugin.settings.wordmark)
@@ -386,8 +387,8 @@ export class HomeTabSettingTab extends PluginSettingTab{
 
 
         const titleFontSettings = new Setting(containerEl)
-            .setName('Title font')
-            .setDesc('Interface font, text font, and monospace font options match the fonts set in the Appearance setting tab.')
+            .setName(t('settings_titleFont'))
+            .setDesc(t('settings_titleFont_desc'))
             // .setDesc(createFragment(f => {
             //     f.appendText('Interface font, text font, and monospace font options');
             //     f.createEl('br')
@@ -401,14 +402,14 @@ export class HomeTabSettingTab extends PluginSettingTab{
             titleFontSettings
                 .addExtraButton((button) => {button
                     .setIcon('alert-circle')
-                    .setTooltip('The font is not valid.')
+                    .setTooltip(t('settings_invalidCss'))
                     invalidFontIcon = button.extraSettingsEl
                     invalidFontIcon.toggleVisibility(false)
                     invalidFontIcon.addClass('mod-warning')})
 
             titleFontSettings.addSearch((text) => {
                 text.setValue(this.plugin.settings.font ? this.plugin.settings.font.replace(/"/g, ''): '')
-                text.setPlaceholder('Type anything ... ')
+                text.setPlaceholder(t('settings_typeAnything'))
                 let suggester: fontSuggesterType | undefined
                 if(!Platform.isMobile && !Platform.isMacOS){
                     // Lazily load fontSuggester (and the native font-list module it
@@ -440,10 +441,10 @@ export class HomeTabSettingTab extends PluginSettingTab{
 
         titleFontSettings
             .addDropdown(dropdown => dropdown
-                .addOption('interfaceFont', 'Interface font')
-                .addOption('textFont', 'Text font')
-                .addOption('monospaceFont', 'Monospace font')
-                .addOption('custom', 'Custom font')
+                .addOption('interfaceFont', t('opt_interfaceFont'))
+                .addOption('textFont', t('opt_textFont'))
+                .addOption('monospaceFont', t('opt_monospaceFont'))
+                .addOption('custom', t('opt_customFont'))
                 .setValue(this.plugin.settings.customFont)
                 .onChange((value: FontChoiches) => {
                     this.plugin.settings.customFont = value
@@ -455,11 +456,11 @@ export class HomeTabSettingTab extends PluginSettingTab{
 
         let invalidFontSizeIcon: HTMLElement
         new Setting(containerEl)
-            .setName('Title font size')
-            .setDesc('Accepts any CSS font-size value.')
+            .setName(t('settings_titleFontSize'))
+            .setDesc(t('settings_titleFontSize_desc'))
             .addExtraButton((button) => {button
                 .setIcon('alert-circle')
-                .setTooltip('The CSS unit is not valid.')
+                .setTooltip(t('settings_invalidCss'))
                 invalidFontSizeIcon = button.extraSettingsEl
                 invalidFontSizeIcon.addClass('mod-warning')
                 invalidFontSizeIcon.toggleVisibility(false)
@@ -479,7 +480,7 @@ export class HomeTabSettingTab extends PluginSettingTab{
             .then((settingEl) => this.addResetButton(settingEl, 'fontSize'))
 
         new Setting(containerEl)
-            .setName('Title font weight')
+            .setName(t('settings_titleFontWeight'))
             // .setDesc('Set title font weight')
             .addSlider((slider) => slider
                 .setLimits(100, 900, 100)
@@ -492,7 +493,7 @@ export class HomeTabSettingTab extends PluginSettingTab{
             .then((settingEl) => this.addResetButton(settingEl, 'fontWeight'))
 
         const titleColorSetting = new Setting(containerEl)
-            .setName('Title color')
+            .setName(t('settings_titleColor'))
 
         if (this.plugin.settings.fontColorType === 'custom'){
             titleColorSetting.addColorPicker((colorPicker) => colorPicker
@@ -502,19 +503,19 @@ export class HomeTabSettingTab extends PluginSettingTab{
 
         titleColorSetting
             .addDropdown((dropdown) => dropdown
-                .addOption('default', 'Theme default')
-                .addOption('accentColor', 'Accent color')
-                .addOption('custom', 'Custom')
+                .addOption('default', t('opt_themeDefault'))
+                .addOption('accentColor', t('opt_accentColor'))
+                .addOption('custom', t('opt_custom'))
                 .setValue(this.plugin.settings.fontColorType)
                 .onChange((value: ColorChoices) => {this.plugin.settings.fontColorType = value; this.plugin.saveSettings(); this.display()}))
             .then((settingEl) => this.addResetButton(settingEl, 'fontColorType'))
     
         new Setting(containerEl)
-        .setName('Selection highlight')
-        .setDesc('Set the color of the selected item.')
+        .setName(t('settings_selectionHighlight'))
+        .setDesc(t('settings_selectionHighlight_desc'))
         .addDropdown((dropdown) => dropdown
-            .addOption('default', 'Theme default')
-            .addOption('accentColor', 'Accent color')
+            .addOption('default', t('opt_themeDefault'))
+            .addOption('accentColor', t('opt_accentColor'))
             .setValue(this.plugin.settings.selectionHighlight)
             .onChange((value: ColorChoices) => {this.plugin.settings.selectionHighlight = value; this.plugin.saveSettings(); this.plugin.refreshOpenViews()}))
         .then((settingEl) => this.addResetButton(settingEl, 'selectionHighlight'))
@@ -524,7 +525,7 @@ export class HomeTabSettingTab extends PluginSettingTab{
         settingElement
             .addExtraButton((button) => button
                     .setIcon('reset')
-                    .setTooltip('Reset to default')
+                    .setTooltip(t('reset_default'))
                     .onClick(() => {
                         this.plugin.settings[settingKey] = DEFAULT_SETTINGS[settingKey]
                         this.plugin.saveSettings()

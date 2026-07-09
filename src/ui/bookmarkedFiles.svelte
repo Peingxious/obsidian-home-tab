@@ -4,6 +4,7 @@
 	import { IconSelectionModal } from "src/iconSelectionModal";
 	import FileDisplayItem from "./svelteComponents/fileDisplayItem.svelte";
 	import type { bookmarkedFile, bookmarkedFilesManager } from "src/bookmarkedFiles";
+	import { t } from "src/i18n";
 
     export let view: View
     export let bookmarkedFiles: bookmarkedFile[]
@@ -18,12 +19,12 @@
 
     const contextualMenu: Menu = new Menu()
             .addItem((item) => item
-                .setTitle('Remove bookmark')
+                .setTitle(t('bookmarks_remove'))
                 .setIcon('trash-2')
                 .onClick(() => bookmarkedFileManager.removeBookmark(selectedFile)))
             .addSeparator()
             .addItem((item) => item
-                .setTitle('Set custom icon')
+                .setTitle(t('bookmarks_setIcon'))
                 .setIcon('plus')
                 .onClick(() => selectIconModal.open()))
             .setUseNativeMenu(app.vault.config.nativeMenus)  

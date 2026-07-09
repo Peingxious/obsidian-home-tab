@@ -4,6 +4,7 @@
     import type { SearchFile } from "src/suggester/fuzzySearch";
 	import type { TextInputSuggester } from "src/suggester/suggester";
 	import Suggestion from './suggestion.svelte';
+	import { t } from 'src/i18n';
 
     export let index: number
     export let textInputSuggester: TextInputSuggester<SearchFile>
@@ -33,7 +34,7 @@
             <!-- If the suggestion name is an alias display the actual filename under it -->
             {#if suggestionItem.aliases && suggestionItem.aliases?.includes(nameToDisplay)}
                 <div class="home-tab-suggestion-description">
-                    <Forward size={15} aria-label={'Alias of'}/>
+                    <Forward size={15} aria-label={t('suggestion_aliasOf')}/>
                     <span>{suggestionItem.basename}</span>
                 </div>
             {/if}
@@ -44,11 +45,11 @@
         {#if !suggestionItem.isCreated}
             <div class="home-tab-suggestion-tip">
                 {#if suggestionItem.isUnresolved}
-                    <FilePlus size={15} aria-label={'Not created yet, select to create'}/>
+                    <FilePlus size={15} aria-label={t('suggestion_notCreated')}/>
                 {:else}
-                    <FileQuestion size={15} aria-label={'Non exists yet, select to create'}/>
+                    <FileQuestion size={15} aria-label={t('suggestion_nonExists')}/>
                     <div class="suggestion-hotkey">
-                        <span>Enter to create</span>
+                        <span>{t('suggestion_enterToCreate')}</span>
                     </div>
                 {/if}
             </div>

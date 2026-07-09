@@ -1,4 +1,5 @@
 import { MarkdownView, Plugin, WorkspaceLeaf } from 'obsidian';
+import { t } from './i18n';
 import { VIEW_TYPE } from './viewConstants'
 // Type-only import: erased at build time, so it does not eagerly pull the
 // (heavy) homeView module graph into the plugin's static load path.
@@ -43,11 +44,11 @@ export default class HomeTab extends Plugin {
 
 		this.addCommand({
 			id: 'open-new-home-tab',
-			name: 'Open new Home tab',
+			name: t('cmd_openNewHomeTab'),
 			callback: () => this.activateView(false, true)})
 		this.addCommand({
 			id: 'open-home-tab',
-			name: 'Replace current tab',
+			name: t('cmd_replaceCurrentTab'),
 			callback: () => this.activateView(true)})
 
 		// Wait for all plugins to load before check if the bookmarked plugin is enabled

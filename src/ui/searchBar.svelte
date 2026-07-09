@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Platform } from "obsidian";
 	import { filterKeys, type FilterKey, type SearchBarFilterType } from "src/homeTabSearchbar";
+	import { t } from "src/i18n";
     import type HomeTabSearchBar from "src/homeTabSearchbar";
     
     export let HomeTabSearchBar: HomeTabSearchBar
@@ -42,7 +43,7 @@
         class:embedded={embedded}
         style:width={embedded || isPhone ? "90%" : "50%"}>
         <div class='nav-file-tag home-tab-suggestion-file-tag hide' bind:this={$activeExtEl}></div>
-        <input type="search" spellcheck="false" placeholder="Type to start search..." bind:value={inputValue} bind:this={$searchBarEl}
+        <input type="search" spellcheck="false" placeholder={t('search_placeholder')} bind:value={inputValue} bind:this={$searchBarEl}
         on:keydown={(e) => handleKeydown(e)}>
     </div>
 </div>

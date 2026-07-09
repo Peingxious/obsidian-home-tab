@@ -3,6 +3,7 @@
 	import type { RecentFileManager, recentFile } from "src/recentFiles";
 	import type { HomeTabSettings } from "src/settings";
 	import FileDisplayItem from "./svelteComponents/fileDisplayItem.svelte";
+	import { t } from "src/i18n";
 
     export let view: View
     export let recentFileList: recentFile[]
@@ -14,7 +15,7 @@
 
     let contextualMenu: Menu = new Menu()
             .addItem((item) => item
-                .setTitle('Hide file')
+                .setTitle(t('recentFiles_hide'))
                 .setIcon('eye-off')
                 .onClick(() => recentFileManager.removeRecentFile(selectedFile)))
             .setUseNativeMenu(app.vault.config.nativeMenus)
@@ -22,7 +23,7 @@
 
 <div class="home-tab-recent-files-container">
     <div class="home-tab-recent-files-title">
-        Recent files
+        {t('recentFiles_title')}
     </div>
     <div class="home-tab-recent-files-wrapper">
         {#each recentFileList as recentFile (recentFile.file.path)}

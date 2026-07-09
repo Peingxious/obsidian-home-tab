@@ -4,6 +4,7 @@ import type HomeTabSearchBar from "src/homeTabSearchbar"
 import { TextInputSuggester } from './suggester'
 import { generateHotkeySuggestion } from 'src/utils/htmlUtils'
 import { get } from 'svelte/store'
+import { t } from 'src/i18n'
 import OmnisearchSuggestion from 'src/ui/svelteComponents/omnisearchSuggestion.svelte'
 import { concatenateStringsToRegex, escapeStringForRegExp } from 'src/utils/regexUtils'
 
@@ -45,11 +46,11 @@ export default class OmnisearchSuggester extends TextInputSuggester<ResultNoteAp
                 // suggestionItemClass: 'suggestion-item omnisearch-result',
                 additionalClasses: `${plugin.settings.selectionHighlight === 'accentColor' ? 'use-accent-color' : ''}`,
                 additionalModalInfo: plugin.settings.showShortcuts ? generateHotkeySuggestion([
-                    {hotkey: '↑↓', action: 'to navigate'},
-                    {hotkey: '↵', action: 'to open'},
+                    {hotkey: '↑↓', action: t('hotkey_navigate')},
+                    {hotkey: '↵', action: t('hotkey_open')},
                     // {hotkey: 'shift ↵', action: 'to create'},
-                    {hotkey: 'ctrl ↵', action: 'to open in new tab'},
-                    {hotkey: 'esc', action: 'to dismiss'},], 
+                    {hotkey: 'ctrl ↵', action: t('hotkey_openNewTab')},
+                    {hotkey: 'esc', action: t('hotkey_dismiss')},], 
                     'home-tab-hotkey-suggestions') : undefined
                 }, plugin.settings.searchDelay)
         this.plugin = plugin
