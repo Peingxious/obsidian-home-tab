@@ -45,7 +45,7 @@ export default class HomeTabFileSuggester extends TextInputSuggester<Fuse.FuseRe
 
         this.app.metadataCache.onCleanCache(() => {
             this.plugin.settings.markdownOnly ? this.files = this.filterSearchFileArray('markdown', getSearchFiles(this.plugin.settings.unresolvedLinks)) : this.files = getSearchFiles(this.plugin.settings.unresolvedLinks)
-            this.fuzzySearch = new FileFuzzySearch(this.files, { ...DEFAULT_FUSE_OPTIONS, ignoreLocation: true, fieldNormWeight: 1.65, keys: [{name: 'basename', weight: 1.5}, {name: 'aliases', weight: 0.1}] })
+            this.fuzzySearch = new FileFuzzySearch(this.files, { ...DEFAULT_FUSE_OPTIONS, ignoreLocation: true, fieldNormWeight: 1.65, keys: [{name: 'basename', weight: 1.5}] })
         })
 
         // Open file in new tab
@@ -102,29 +102,31 @@ export default class HomeTabFileSuggester extends TextInputSuggester<Fuse.FuseRe
     }
 
     updateSearchfilesList(file:TFile, oldPath?: string){
-        this.app.metadataCache.onCleanCache(() => {
-            if(oldPath){
-                this.files.splice(this.files.findIndex((f) => f.path === oldPath),1)
+        // Update the maintained file list immediately. Previously this was wrapped
+        // in metadataCache.onCleanCache, which (a) deferred the update until the next
+        // cache clean — sometimes never firing — and (b) registered a NEW handler on
+        // every create/delete/rename event, leaking handlers over time.
+        if(oldPath){
+            this.files.splice(this.files.findIndex((f) => f.path === oldPath),1)
+            this.files.push(generateSearchFile(file))
+        }
+        if(file.deleted){
+            this.files.splice(this.files.findIndex((f) => f.path === file.path),1)
+
+            // if(isUnresolved({name: file.name, path: file.path, basename: file.basename, extension: file.extension})){
+            //     this.files.push(generateMarkdownUnresolvedFile(file.path))
+            // }
+        }
+        else{
+            const fileIndex = this.files.findIndex((f) => f.path === file.path)
+            if(fileIndex === -1){
                 this.files.push(generateSearchFile(file))
             }
-            if(file.deleted){
-                this.files.splice(this.files.findIndex((f) => f.path === file.path),1)
-    
-                // if(isUnresolved({name: file.name, path: file.path, basename: file.basename, extension: file.extension})){
-                //     this.files.push(generateMarkdownUnresolvedFile(file.path))
-                // }
+            else if(this.files[fileIndex].isUnresolved){
+                this.files[fileIndex] = generateSearchFile(file)
             }
-            else{
-                const fileIndex = this.files.findIndex((f) => f.path === file.path)
-                if(fileIndex === -1){
-                    this.files.push(generateSearchFile(file))
-                }
-                else if(this.files[fileIndex].isUnresolved){
-                    this.files[fileIndex] = generateSearchFile(file)
-                }
-            }
-            this.fuzzySearch.updateSearchArray(this.files)
-        })
+        }
+        this.fuzzySearch.updateSearchArray(this.files)
     }
 
     onNoSuggestion(): void {
@@ -226,9 +228,10 @@ export default class HomeTabFileSuggester extends TextInputSuggester<Fuse.FuseRe
     setFileFilter(filterKey: FileType | FileExtension): void{
         this.activeFilter = filterKey
         
-        this.app.metadataCache.onCleanCache(() => {
-            this.fuzzySearch.updateSearchArray(this.filterSearchFileArray(filterKey, this.plugin.settings.markdownOnly ? getSearchFiles(this.plugin.settings.unresolvedLinks) : this.files))
-        })
+        // Reuse the already-maintained `this.files` instead of re-scanning the
+        // entire vault (getSearchFiles) on every filter change. That full re-scan
+        // was a major source of input-lag on large vaults.
+        this.fuzzySearch.updateSearchArray(this.filterSearchFileArray(filterKey, this.files))
         
         this.suggester.setSuggestions([]) // Reset search suggestions
         this.close()

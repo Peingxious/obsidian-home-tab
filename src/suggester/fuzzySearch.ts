@@ -1,6 +1,6 @@
 import Fuse from "fuse.js";
 import type { TFile } from "obsidian";
-import { getImageFiles, getMarkdownSearchFiles} from "src/utils/getFilesUtils";
+import { getFileAliases, getImageFiles, getMarkdownSearchFiles} from "src/utils/getFilesUtils";
 import type { FileType } from "src/utils/getFileTypeUtils"
 import type { SurfingItem } from "./surfingSuggester";
 
@@ -73,6 +73,10 @@ export class MarkdownFileFuzzySearch extends fuzzySearch<MarkdownSearchFile>{
     // Return the best match between the filename and the aliases
     getBestMatch(searchResultElement: Fuse.FuseResult<MarkdownSearchFile>, querry: string): string{
         const searchFile = searchResultElement.item
+        // Resolve aliases lazily, only for results that are actually displayed.
+        if(!searchFile.aliases && searchFile.file){
+            searchFile.aliases = getFileAliases(searchFile.file)
+        }
         if (!searchFile.aliases){
             return searchFile.basename
         }
@@ -105,6 +109,10 @@ export class FileFuzzySearch extends fuzzySearch<SearchFile>{
         const searchFile = searchResultElement.item
         // if(searchFile.fileType != 'markdown') return searchFile.name
         
+        // Resolve aliases lazily, only for results that are actually displayed.
+        if(!searchFile.aliases && searchFile.file){
+            searchFile.aliases = getFileAliases(searchFile.file)
+        }
         if (!searchFile.aliases) return searchFile.basename
 
         const searchArray: string[] = []

@@ -1,9 +1,14 @@
 import esbuild from "esbuild";
 import process from "process";
-import builtins from 'builtin-modules'
+import { builtinModules } from "node:module";
+import path from "node:path";
+import fs from "node:fs";
+import { fileURLToPath } from "node:url";
 
 import esbuildSvelte from "esbuild-svelte";
 import sveltePreprocess from "svelte-preprocess";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const banner =
 `/*
@@ -14,7 +19,35 @@ if you want to view the source, please visit the github repository of this plugi
 
 const prod = (process.argv[2] === 'production');
 
-esbuild.build({
+// Resolve the codebase's `src/...` import prefix (e.g. `src/homeView`) to the
+// local ./src directory. This works on both older esbuild (no `alias` option)
+// and the modern esbuild used by the sample-plugin template.
+const srcAliasPlugin = {
+	name: 'src-alias',
+	setup(build) {
+		build.onResolve({ filter: /^src\// }, (args) => {
+			const resolved = path.resolve(__dirname, args.path);
+			const exts = ['.ts', '.tsx', '.svelte', '.js', '.jsx', '.json'];
+			if (fs.existsSync(resolved) && fs.statSync(resolved).isFile()) {
+				return { path: resolved };
+			}
+			for (const ext of exts) {
+				if (fs.existsSync(resolved + ext)) {
+					return { path: resolved + ext };
+				}
+			}
+			// Fall back to a directory index if applicable.
+			for (const ext of exts) {
+				if (fs.existsSync(path.join(resolved, 'index' + ext))) {
+					return { path: path.join(resolved, 'index' + ext) };
+				}
+			}
+			return { path: resolved };
+		});
+	},
+};
+
+const options = {
 	banner: {
 		js: banner,
 	},
@@ -34,18 +67,40 @@ esbuild.build({
 		'@lezer/common',
 		'@lezer/highlight',
 		'@lezer/lr',
-		...builtins],
+		...builtinModules],
 	format: 'cjs',
-	watch: !prod,
-	target: 'es2018',
+	target: 'es2021',
 	logLevel: "info",
 	sourcemap: prod ? false : 'inline',
 	treeShaking: true,
+	minify: prod,
 	outfile: prod ? 'main.js' : '../developmentVault/.obsidian/plugins/home-tab/main.js',
 	plugins: [
+		srcAliasPlugin,
 		esbuildSvelte({
 		  compilerOptions: { css: true },
 		  preprocess: sveltePreprocess(),
+		  // Suppress Svelte a11y warnings for the suggestion/bookmark UI: these are
+		  // mouse-driven popovers whose keyboard navigation is handled by the parent
+		  // suggester, so the per-element warnings are false positives here.
+		  filterWarnings: (warning) => warning.code !== 'a11y-click-events-have-key-events',
 		}),
 	  ],
-}).catch(() => process.exit(1));
+};
+
+// Use the modern context API when available (esbuild >= 0.12); fall back to the
+// synchronous build() API on older esbuild so the build still works without a reinstall.
+if (typeof esbuild.context === "function") {
+	const context = await esbuild.context(options);
+	if (prod) {
+		await context.rebuild();
+		process.exit(0);
+	} else {
+		await context.watch();
+	}
+} else {
+	await esbuild.build({ ...options, watch: !prod });
+	if (prod) {
+		process.exit(0);
+	}
+}

@@ -35,7 +35,6 @@ export function generateMarkdownSearchFile(file: TFile): MarkdownSearchFile{
         name: file.name,
         basename: file.basename,
         path: file.path,
-        aliases: getFileAliases(file),
         isCreated: true,
         file: file,
     }
@@ -57,7 +56,6 @@ export function generateSearchFile(file: TFile): SearchFile{
         name: file.name,
         basename: file.basename,
         path: file.path,
-        aliases: getFileAliases(file),
         isCreated: true,
         file: file,
         fileType: getFileTypeFromExtension(file.extension),

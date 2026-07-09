@@ -5,7 +5,7 @@ import { lucideIcons, type LucideIcon } from './utils/lucideIcons'
 import ImageFileSuggester from './suggester/imageSuggester'
 import cssUnitValidator from './utils/cssUnitValidator'
 import isLink from './utils/isLink'
-import fontSuggester from './suggester/fontSuggester'
+import type fontSuggesterType from './suggester/fontSuggester'
 import type { recentFileStore } from './recentFiles'
 import type { bookmarkedFileStore } from './bookmarkedFiles'
 import { checkFont } from './utils/fontValidator'
@@ -409,12 +409,19 @@ export class HomeTabSettingTab extends PluginSettingTab{
             titleFontSettings.addSearch((text) => {
                 text.setValue(this.plugin.settings.font ? this.plugin.settings.font.replace(/"/g, ''): '')
                 text.setPlaceholder('Type anything ... ')
-                const suggester: fontSuggester | undefined = Platform.isMobile || Platform.isMacOS ? undefined : new fontSuggester(this.app, text.inputEl, {
-                    isScrollable: true,
-                    style: `max-height: 200px;
-                    width: fit-content;
-                    min-width: 200px;`}, 
-                    true)
+                let suggester: fontSuggesterType | undefined
+                if(!Platform.isMobile && !Platform.isMacOS){
+                    // Lazily load fontSuggester (and the native font-list module it
+                    // depends on) only when the font picker is actually rendered.
+                    import('./suggester/fontSuggester').then(({ default: fontSuggester }) => {
+                        suggester = new fontSuggester(this.app, text.inputEl, {
+                            isScrollable: true,
+                            style: `max-height: 200px;
+                            width: fit-content;
+                            min-width: 200px;`}, 
+                            true)
+                    })
+                }
 
                 text.onChange(async (value) => {
                     value = value.indexOf(' ') >= 0 ? `"${value}"` : value //Restore "" if font name contains whitespaces

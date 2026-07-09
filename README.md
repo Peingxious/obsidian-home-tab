@@ -11,6 +11,15 @@ You can search any local file in your vault, both markdown notes and attachments
 
 This plugin is not meant to be a replacement for the default Quick switcher or any alternative one like [Another quick switcher](https://github.com/tadashi-aikawa/obsidian-another-quick-switcher) (from which I took inspiration), but rather a faster way to open a note or a file after opening a new tab.
 
+## Changelog
+### 1.2.3
+Performance and stability improvements (no behavior changes for end users):
+- **Faster startup**: the Home view and its search subsystem (homepage, search bar, suggesters, `fuse.js`) are now lazy-loaded, so the plugin no longer eagerly parses the heavy module graph on load.
+- **Snappier filtering**: switching the file-type/extension filter now reuses the already-maintained file list instead of re-scanning the entire vault and rebuilding the index.
+- **Lighter scan**: file aliases are resolved lazily only for the results that are actually displayed, instead of being computed for every file during the initial scan.
+- **Lazy native font enumeration**: the `font-list` module (which spawns a process to enumerate system fonts) is now loaded only when the font picker is opened on desktop (non-mac).
+- **Bug fix**: stopped leaking `metadataCache.onCleanCache` handlers on every file create/rename/delete, and file-list updates now apply synchronously.
+
 ## How to use
 By default, every new empty tab is automatically replaced with the Home tab view. You can disable this behavior in the settings and manually open a new Home tab through the command palette with the commands `Home tab: Open new Home tab` or `Home tab: Replace current tab`.
 

@@ -1,61 +1,14 @@
 import { MarkdownView, Plugin, WorkspaceLeaf } from 'obsidian';
-import { EmbeddedHomeTab, HomeTabView, VIEW_TYPE } from 'src/homeView';
+import { VIEW_TYPE } from './viewConstants'
+// Type-only import: erased at build time, so it does not eagerly pull the
+// (heavy) homeView module graph into the plugin's static load path.
+import type { EmbeddedHomeTab } from './homeView'
 import { HomeTabSettingTab, DEFAULT_SETTINGS, type HomeTabSettings } from './settings'
 import { pluginSettingsStore, bookmarkedFiles } from './store'
 import { RecentFileManager } from './recentFiles';
 import { bookmarkedFilesManager } from './bookmarkedFiles';
 
-declare module 'obsidian'{
-	interface App{
-		internalPlugins: InternalPlugins
-		plugins: Plugins
-		dom: any
-		isMobile: boolean
-	}
-	interface InternalPlugins{
-		getPluginById: Function
-		plugins: {
-			bookmarks: BookmarksPlugin
-		}
-	}
-	interface Plugins{
-		getPlugin: (id: string) => Plugin_2
-	}
-	interface BookmarksPlugin extends Plugin_2{
-		instance: {
-			items: BookmarkItem[]
-			getBookmarks: () => BookmarkItem[]
-			removeItem: (item: BookmarkItem) => void
-		}
-	}
-	interface BookmarkItem{
-		type: string,
-		title: string | undefined,
-		path: string
-	}
-	interface config{
-		nativeMenus: boolean
-	}
-	interface Vault{
-		config: config
-	}
-	interface Workspace{
-		createLeafInTabGroup: Function
-	}
-	interface WorkspaceLeaf{
-		rebuildView: Function
-		parent: WorkspaceSplit
-		activeTime: number
-		app: App
-	}
-	interface WorkspaceSplit{
-		children: WorkspaceLeaf[]
-	}
-	interface TFile{
-		deleted: boolean
-	}
-}
-
+// Obsidian 类型增强（ambient augmentation）集中在 src/obsidian-augmentation.d.ts
 export default class HomeTab extends Plugin {
 	settings: HomeTabSettings;
 	recentFileManager: RecentFileManager
@@ -65,14 +18,21 @@ export default class HomeTab extends Plugin {
 	async onload() {
 		console.log('Loading home-tab plugin')
 		
+		// Lazily evaluate the (heavy) Home view module graph — homepage, search bar,
+		// suggesters, fuse.js, etc. — off the plugin's static load path. esbuild wraps
+		// it as a lazy factory, so none of that code runs until this dynamic import
+		// resolves (here, right after settings load instead of at plugin parse time).
+		let HomeTabViewClass: typeof import('./homeView').HomeTabView
 		await this.loadSettings();
+		const homeViewModule = await import('./homeView')
+		HomeTabViewClass = homeViewModule.HomeTabView
 		this.addSettingTab(new HomeTabSettingTab(this.app, this))
-		this.registerView(VIEW_TYPE, (leaf) => new HomeTabView(leaf, this));		
+		this.registerView(VIEW_TYPE, (leaf) => new HomeTabViewClass(leaf, this));		
 
 		// Replace new tabs with home tab view
 		this.registerEvent(this.app.workspace.on('layout-change', () => this.onLayoutChange()))
 		// Refocus search bar on leaf change
-		this.registerEvent(this.app.workspace.on('active-leaf-change', (leaf: WorkspaceLeaf) => {if(leaf.view instanceof HomeTabView){leaf.view.searchBar.focusSearchbar()}}))
+		this.registerEvent(this.app.workspace.on('active-leaf-change', (leaf: WorkspaceLeaf) => {if(leaf.view instanceof HomeTabViewClass){leaf.view.searchBar.focusSearchbar()}}))
 
 		pluginSettingsStore.set(this.settings) // Store the settings for the svelte components
 
@@ -100,9 +60,12 @@ export default class HomeTab extends Plugin {
 			this.registerMarkdownCodeBlockProcessor('search-bar', (source, el, ctx) => {
 				const view = this.app.workspace.getActiveViewOfType(MarkdownView)
 				if(view){
-					let embeddedHomeTab = new EmbeddedHomeTab(el, view, this, source)
-					this.activeEmbeddedHomeTabViews.push(embeddedHomeTab)
-					ctx.addChild(embeddedHomeTab)
+					// EmbeddedHomeTab is part of the lazily-loaded homeView module.
+					import('./homeView').then(({ EmbeddedHomeTab }) => {
+						let embeddedHomeTab = new EmbeddedHomeTab(el, view, this, source)
+						this.activeEmbeddedHomeTabViews.push(embeddedHomeTab)
+						ctx.addChild(embeddedHomeTab)
+					})
 				}
 			})
 

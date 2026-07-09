@@ -3,7 +3,7 @@ import type HomeTab from "./main";
 import Homepage from './ui/homepage.svelte'
 import HomeTabSearchBar from "./homeTabSearchbar";
 
-export const VIEW_TYPE = "home-tab-view";
+import { VIEW_TYPE } from './viewConstants'
 
 export class EmbeddedHomeTab extends MarkdownRenderChild{
     searchBar: HomeTabSearchBar
